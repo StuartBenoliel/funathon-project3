@@ -170,6 +170,7 @@ for step in range(3):
     optimizer.step()
     print(f"Step {step + 1} loss: {loss.item():.4f}")
 ```
+
 :::
 
 # Tracking Experiments with MLflow
@@ -209,6 +210,8 @@ mlf_logger = MLFlowLogger(
     log_model=True,   # upload the best checkpoint as an MLflow artifact
 )
 ```
+::: 
+
 
 ::: {.callout-note}
 ## Finding your MLflow URI on SSP Cloud
