@@ -119,8 +119,7 @@ stats_tile["share_pct"] = (__ / total_km2 * 100).round(2)  # TODO: column to nor
 )
 ```
 
-::: {.callout-tip collapse="true"}
-## Hint
+::: {.callout-tip collapse="true" title="Hint"}
 
 - Use `"count"` for `n_polygons`, `"sum"` for totals, `"mean"` and `"max"`
   for polygon size statistics.
@@ -129,8 +128,7 @@ stats_tile["share_pct"] = (__ / total_km2 * 100).round(2)  # TODO: column to nor
 - Pass `rowname_col="class_name"` to `GT()` to use class names as row labels.
 :::
 
-::: {.callout-tip collapse="true"}
-## Solution
+::: {.callout-tip collapse="true" title="Solution"}
 
 ```{python}
 #| eval: true
@@ -249,8 +247,7 @@ summary_df = pd.DataFrame({
 )
 ```
 
-::: {.callout-tip collapse="true"}
-## Hint
+::: {.callout-tip collapse="true" title="Hint"}
 
 - Sealed = label 1, Forest = labels 2, 3, 4, Agricultural = labels 6, 7,
   Water = label 10.
@@ -258,8 +255,7 @@ summary_df = pd.DataFrame({
 - Build a small `pd.DataFrame` before passing it to `GT()`.
 :::
 
-::: {.callout-tip collapse="true"}
-## Solution
+::: {.callout-tip collapse="true" title="Solution"}
 
 ```{python}
 #| eval: true
@@ -338,15 +334,13 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-tip collapse="true"}
-## Hint
+::: {.callout-tip collapse="true" title="Hint"}
 
 - Index on `"class_name"`, plot `"total_area_km2"`.
 - `ax.set_xlabel("Area (km²)")` and give a descriptive title.
 :::
 
-::: {.callout-tip collapse="true"}
-## Solution
+::: {.callout-tip collapse="true" title="Solution"}
 
 ```{python}
 #| eval: true
@@ -476,16 +470,14 @@ comparison = pd.concat([__, __], axis=1).fillna(0).reset_index()  # TODO: tile_s
 )
 ```
 
-::: {.callout-tip collapse="true"}
-## Hint
+::: {.callout-tip collapse="true" title="Hint"}
 
 - Same pattern as Exercise 1 — just replace `gdf_tile` with `gdf_nuts`.
 - Rename the share columns `"tile_share_pct"` and `"nuts3_share_pct"`.
 - Call `.reset_index()` on the comparison DataFrame before passing to `GT()`.
 :::
 
-::: {.callout-tip collapse="true"}
-## Solution
+::: {.callout-tip collapse="true" title="Solution"}
 
 ```{python}
 #| eval: true
@@ -606,15 +598,13 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-tip collapse="true"}
-## Hint
+::: {.callout-tip collapse="true" title="Hint"}
 
 - Left panel: `"total_area_km2"`, label `"Area (km²)"`.
 - Right panel: `"share_pct"`, label `"Share (%)"`.
 :::
 
-::: {.callout-tip collapse="true"}
-## Solution
+::: {.callout-tip collapse="true" title="Solution"}
 
 ```{python}
 #| eval: true
@@ -766,8 +756,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-tip collapse="true"}
-## Hint
+::: {.callout-tip collapse="true" title="Hint"}
 
 - The 2021 tile filename is identical to 2024 — only the year in the path
   changes.
@@ -779,8 +768,7 @@ plt.show()
   domain=[-5, 5])` colours losses red and gains green automatically.
 :::
 
-::: {.callout-tip collapse="true"}
-## Solution
+::: {.callout-tip collapse="true" title="Solution"}
 
 ```{python}
 #| eval: true
@@ -1003,8 +991,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-::: {.callout-tip collapse="true"}
-## Hint
+::: {.callout-tip collapse="true" title="Hint"}
 
 - The response key for `/predict_nuts` is `"predictions"`.
 - `compute_stats()` is already defined in Exercise 6 — reuse it directly.
@@ -1014,8 +1001,7 @@ plt.show()
 - For the change bar chart: `colors = ["green" if v >= 0 else "red" for v in ...]`.
 :::
 
-::: {.callout-tip collapse="true"}
-## Solution
+::: {.callout-tip collapse="true" title="Solution"}
 
 ```{python}
 #| eval: true
@@ -1157,32 +1143,33 @@ plt.tight_layout()
 plt.show()
 ```
 
-## Interactive map — spatial change in sealed surfaces
+## Interactive map — forest loss (2021 → 2024)
 
-Rather than summarising sealed surface change as statistics, this map shows
-**where** sealing has appeared or disappeared between 2021 and 2024. Zones
-in red are areas that became sealed, zones in blue are areas that lost their
-sealed status. The comparison is based on a spatial intersection of the two
-prediction layers, ensuring that only genuine geometric changes are shown.
+The statistics above show where forest cover has changed globally across the
+region. This map goes further by showing **where exactly** forest has
+disappeared between 2021 and 2024. Using a geometric `overlay()`, we isolate
+only the areas that were forested in 2021 but are no longer in 2024 —
+providing a spatially precise picture of deforestation hotspots.
 
 ::: {.callout-caution}
-## Exercise 8 — Map sealed surface change (2021 → 2024) with a heatmap
+## Exercise 8 — Map forest loss (2021 → 2024) with a heatmap
 
-**Goal:** Display the spatial distribution of sealed surface gains and losses
-across the NUTS3 region using two `folium.plugins.HeatMap` layers — one for
-areas that gained sealing, one for areas that lost it. Use a geometric
-`overlay()` to isolate true spatial changes rather than comparing centroid
-densities.
+**Goal:** Display the spatial distribution of forest loss across the NUTS3
+region using a single `folium.plugins.HeatMap` layer. Forest polygons
+(labels 2, 3, 4) are compared geometrically between 2021 and 2024 using
+`.overlay()` to isolate areas that genuinely lost tree cover.
 
 **Steps:**
 
-1. Filter sealed polygons (label 1) from both years in EPSG:3035
-2. Use `.overlay(..., how="difference")` to compute gained and lost geometries
-3. Recompute `area_km2` after the overlay and filter out micro-polygons
-4. Reproject to EPSG:4326, compute centroids, build `heat_gained` and
-   `heat_lost` as `[lat, lon, area_km2]` lists
-5. Create a `folium.Map` and add both `HeatMap` layers with distinct gradients
-6. Add a `LayerControl` to toggle the two layers independently
+1. Filter forest polygons (labels 2, 3, 4) from both years in EPSG:3035
+2. Dissolve each year into a single geometry with `.dissolve()`
+3. Use `.overlay(..., how="difference")` to compute forest lost between
+   2021 and 2024
+4. Recompute `area_km2` after the overlay and filter out micro-polygons
+5. Reproject to EPSG:4326, compute centroids, build `heat_data` as
+   `[lat, lon, area_km2]`
+6. Create a `folium.Map` and add a single `HeatMap` layer with a green
+   gradient
 :::
 
 ```{python}
@@ -1190,74 +1177,65 @@ densities.
 import folium
 from folium.plugins import HeatMap
 
-# Filter sealed polygons — stay in metric CRS for the overlay
-sealed_2021 = gdf_nuts_2021[gdf_nuts_2021["label"] == __].to_crs("__").copy()  # TODO: label, CRS
-sealed_2024 = gdf_nuts[gdf_nuts["label"] == __].to_crs("__").copy()            # TODO: label, CRS
+FOREST_LABELS = [__, __, __]  # TODO: forest label integers
 
-# Geometric difference: what is in 2024 but not in 2021, and vice versa
-gained = sealed_2024.overlay(__, how="__")  # TODO: reference layer, method
-lost   = sealed_2021.overlay(__, how="__")  # TODO: reference layer, method
+# Filter and dissolve forest polygons per year — stay in metric CRS
+forest_2021 = (
+    gdf_nuts_2021[gdf_nuts_2021["label"].isin(__)]  # TODO: forest labels
+    .to_crs("__")                                    # TODO: metric CRS
+    .dissolve()
+    .reset_index(drop=True)
+)
+forest_2024 = (
+    gdf_nuts[gdf_nuts["label"].isin(__)]             # TODO: forest labels
+    .to_crs("__")                                    # TODO: metric CRS
+    .dissolve()
+    .reset_index(drop=True)
+)
 
-# Recompute areas after clipping and remove residual slivers
-gained["area_km2"] = gained.geometry.area / 1e6
-lost["area_km2"]   = lost.geometry.area   / 1e6
+# Forest present in 2021 but absent in 2024 = lost forest
+forest_lost = forest_2021.overlay(__, how="__")  # TODO: reference layer, method
 
-gained = gained[gained["area_km2"] > __]  # TODO: minimum area threshold (float)
-lost   = lost[lost["area_km2"]   > __]    # TODO: minimum area threshold (float)
+# Recompute areas and drop slivers
+forest_lost["area_km2"] = forest_lost.geometry.area / 1e6
+forest_lost = forest_lost[forest_lost["area_km2"] > __]  # TODO: threshold (float)
 
-# Reproject to WGS84 for Folium
-gained_wgs84 = gained.to_crs("__")  # TODO: CRS
-lost_wgs84   = lost.to_crs("__")    # TODO: CRS
+# Reproject and compute centroids
+forest_lost_wgs84 = forest_lost.to_crs("__")  # TODO: CRS
+forest_lost_wgs84["centroid"] = forest_lost_wgs84.geometry.centroid
 
-gained_wgs84["centroid"] = gained_wgs84.geometry.centroid
-lost_wgs84["centroid"]   = lost_wgs84.geometry.centroid
-
-heat_gained = [
+heat_data = [
     [row.centroid.__, row.centroid.__, row.area_km2]  # TODO: lat/lon attributes
-    for _, row in gained_wgs84.iterrows()
-]
-heat_lost = [
-    [row.centroid.__, row.centroid.__, row.area_km2]  # TODO: lat/lon attributes
-    for _, row in lost_wgs84.iterrows()
+    for _, row in forest_lost_wgs84.iterrows()
 ]
 
-center = gained_wgs84.geometry.centroid.union_all().centroid
+center = forest_lost_wgs84.geometry.centroid.union_all().centroid
 m = folium.Map(location=[center.y, center.x], zoom_start=__)  # TODO: zoom level
 
 HeatMap(
-    __,           # TODO: heat_gained
+    __,           # TODO: heat_data
     radius=__, blur=__, max_zoom=13,
-    gradient={0.4: "lightyellow", 0.7: "orange", 1.0: "red"},
-    name="Gained sealed 2021→2024",
-).add_to(m)
-
-HeatMap(
-    __,           # TODO: heat_lost
-    radius=__, blur=__, max_zoom=13,
-    gradient={0.4: "lightcyan", 0.7: "dodgerblue", 1.0: "darkblue"},
-    name="Lost sealed 2021→2024",
+    gradient={0.4: "lightgreen", 0.7: "forestgreen", 1.0: "darkgreen"},
+    name="Forest loss 2021→2024",
 ).add_to(m)
 
 folium.LayerControl().add_to(m)
 m
 ```
 
-::: {.callout-tip collapse="true"}
-## Hint
+::: {.callout-tip collapse="true" title="Hint"}
 
-- Filter with `gdf_nuts_2021[gdf_nuts_2021["label"] == 1]`, same for 2024.
-- Keep EPSG:3035 for the overlay so distances are in metres.
-- `sealed_2024.overlay(sealed_2021, how="difference")` gives polygons in
-  2024 that are not covered by 2021 — i.e. newly sealed areas.
-- `sealed_2021.overlay(sealed_2024, how="difference")` gives the reverse —
-  areas that were sealed in 2021 but not in 2024.
+- Forest labels are 2, 3, 4 — use `.isin([2, 3, 4])`.
+- `.dissolve()` merges all forest polygons of a year into one multipolygon,
+  which makes the overlay much faster and avoids duplicate intersections.
+- `forest_2021.overlay(forest_2024, how="difference")` returns the parts of
+  2021 forest not covered by 2024 forest — i.e. areas that lost tree cover.
 - Use `1e-6` as the minimum area threshold to drop topological slivers.
 - Reproject to `"EPSG:4326"` before computing centroids for Folium.
 - `radius=15` and `blur=20` are good starting values.
 :::
 
-::: {.callout-tip collapse="true"}
-## Solution
+::: {.callout-tip collapse="true" title="Solution"}
 
 ```{python}
 #| eval: true
@@ -1266,48 +1244,42 @@ m
 import folium
 from folium.plugins import HeatMap
 
-sealed_2021 = gdf_nuts_2021[gdf_nuts_2021["label"] == 1].to_crs("EPSG:3035").copy()
-sealed_2024 = gdf_nuts[gdf_nuts["label"] == 1].to_crs("EPSG:3035").copy()
+FOREST_LABELS = [2, 3, 4]
 
-gained = sealed_2024.overlay(sealed_2021, how="difference")
-lost   = sealed_2021.overlay(sealed_2024, how="difference")
+forest_2021 = (
+    gdf_nuts_2021[gdf_nuts_2021["label"].isin(FOREST_LABELS)]
+    .to_crs("EPSG:3035")
+    .dissolve()
+    .reset_index(drop=True)
+)
+forest_2024 = (
+    gdf_nuts[gdf_nuts["label"].isin(FOREST_LABELS)]
+    .to_crs("EPSG:3035")
+    .dissolve()
+    .reset_index(drop=True)
+)
 
-gained["area_km2"] = gained.geometry.area / 1e6
-lost["area_km2"]   = lost.geometry.area   / 1e6
+forest_lost = forest_2021.overlay(forest_2024, how="difference")
 
-gained = gained[gained["area_km2"] > 1e-6]
-lost   = lost[lost["area_km2"]   > 1e-6]
+forest_lost["area_km2"] = forest_lost.geometry.area / 1e6
+forest_lost = forest_lost[forest_lost["area_km2"] > 1e-6]
 
-gained_wgs84 = gained.to_crs("EPSG:4326")
-lost_wgs84   = lost.to_crs("EPSG:4326")
+forest_lost_wgs84 = forest_lost.to_crs("EPSG:4326")
+forest_lost_wgs84["centroid"] = forest_lost_wgs84.geometry.centroid
 
-gained_wgs84["centroid"] = gained_wgs84.geometry.centroid
-lost_wgs84["centroid"]   = lost_wgs84.geometry.centroid
-
-heat_gained = [
+heat_data = [
     [row.centroid.y, row.centroid.x, row.area_km2]
-    for _, row in gained_wgs84.iterrows()
-]
-heat_lost = [
-    [row.centroid.y, row.centroid.x, row.area_km2]
-    for _, row in lost_wgs84.iterrows()
+    for _, row in forest_lost_wgs84.iterrows()
 ]
 
-center = gained_wgs84.geometry.centroid.union_all().centroid
+center = forest_lost_wgs84.geometry.centroid.union_all().centroid
 m = folium.Map(location=[center.y, center.x], zoom_start=11)
 
 HeatMap(
-    heat_gained,
+    heat_data,
     radius=15, blur=20, max_zoom=13,
-    gradient={0.4: "lightyellow", 0.7: "orange", 1.0: "red"},
-    name="Gained sealed 2021→2024",
-).add_to(m)
-
-HeatMap(
-    heat_lost,
-    radius=15, blur=20, max_zoom=13,
-    gradient={0.4: "lightcyan", 0.7: "dodgerblue", 1.0: "darkblue"},
-    name="Lost sealed 2021→2024",
+    gradient={0.4: "lightgreen", 0.7: "forestgreen", 1.0: "darkgreen"},
+    name="Forest loss 2021→2024",
 ).add_to(m)
 
 folium.LayerControl().add_to(m)
