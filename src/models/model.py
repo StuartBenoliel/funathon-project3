@@ -68,7 +68,7 @@ class SemanticSegmentationSegformer(SegformerPreTrainedModel):
         # When labels are supplied (training), upsample logits back to the label
         # resolution so cross-entropy can be computed pixel-for-pixel. At
         # inference (labels=None) we return the raw H/4 logits — the caller
-        # decides whether to upsample (see utils.make_prediction).
+        # decides whether to upsample (see src.inference.prediction make_prediction).
         if labels is not None:
             return nn.functional.interpolate(
                 logits, size=labels.shape[-2:], mode="bilinear", align_corners=False
@@ -87,10 +87,9 @@ class SegformerB5(SemanticSegmentationSegformer):
         n_bands="14",
         logits: bool = True,
         freeze_encoder: bool = False,
-        type_labeler: str = "CLCplus-Backbone",
     ):
         id2label = requests.get(
-            f"https://minio.lab.sspcloud.fr/projet-hackathon-ntts-2025/data-label/{type_labeler}/{type_labeler.lower()}-id2label.json"
+            "https://minio.lab.sspcloud.fr/projet-funathon/2026/project3/data/clcplus-backbone-id2label.json"
         ).json()
         id2label = {int(k): v for k, v in id2label.items()}
         label2id = {v: k for k, v in id2label.items()}
