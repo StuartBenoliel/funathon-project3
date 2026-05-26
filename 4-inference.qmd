@@ -972,7 +972,7 @@ folium.LayerControl(collapsed=False).add_to(m)
 m
 ```
 :::
-To avoid overloading the web page, the map displaying only the prediction layer is shown.
+
 ```{python}
 #| eval: true
 #| echo: false
