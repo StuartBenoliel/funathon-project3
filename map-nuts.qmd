@@ -41,7 +41,6 @@ print(gdf_nuts.head())
 
 gdf_nuts_dissolved = gdf_nuts.dissolve(by="label").reset_index()
 gdf_nuts_dissolved["geometry"] = gdf_nuts_dissolved.geometry.simplify(500, preserve_topology=True)
-
 gdf_nuts_wgs84 = gdf_nuts_dissolved.to_crs("EPSG:4326")
 nuts_center = gdf_nuts_wgs84.geometry.centroid.union_all().centroid
 
