@@ -1505,6 +1505,7 @@ and save it to a Parquet file.
 2. Parse the response as a GeoDataFrame
 3. Print the number of polygons and the first rows
 4. Display on a Folium map with per-class colouring
+5. Save the Folium map to visualize it
 :::
 
 ```{python}
@@ -1568,7 +1569,7 @@ __.add_to(m_nuts)  # TODO: add fg_pred to map
 
 folium.LayerControl(collapsed=__).add_to(m_nuts)  # TODO: collapsed (bool)
 
-m_nuts
+m_nuts.save("map_nuts.html")
 ```
 
 ::: {.callout-tip collapse="true"}
@@ -1644,7 +1645,7 @@ fg_pred.add_to(m_nuts)
 
 folium.LayerControl(collapsed=False).add_to(m_nuts)
 
-m_nuts
+m_nuts.save("map_nuts.html")
 ```
 :::
 
@@ -1703,11 +1704,4 @@ fg_pred.add_to(m_nuts)
 folium.LayerControl(collapsed=False).add_to(m_nuts)
 
 m_nuts.save("map_nuts.html")
-```
-
-```{python}
-#| eval: true
-#| echo: false
-from IPython.display import IFrame
-IFrame("map_nuts.html", width="100%", height="500px")
 ```
